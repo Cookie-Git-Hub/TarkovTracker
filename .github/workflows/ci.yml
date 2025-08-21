@@ -17,19 +17,27 @@ jobs:
   ci:
     name: build-and-test
     runs-on: ubuntu-latest
+    env:
+      CI: true
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: 22   
-          cache: yarn 
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: |
+            yarn.lock
+            .yarnrc.yml
 
-      - name: Enable Corepack (Yarn Berry)
-        run: corepack enable
+      - name: Enable Corepack & pin Yarn
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.1 --activate
+          yarn --version
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -42,4 +50,3 @@ jobs:
 
       - name: Build
         run: yarn build
-
